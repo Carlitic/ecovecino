@@ -1,0 +1,79 @@
+:root {
+  /* Green Theme Palette (Eco Vecinos) */
+  --color-primary: #10b981;
+  /* Emerald 500 */
+  --color-primary-hover: #059669;
+  /* Emerald 600 */
+  --color-primary-light: #d1fae5;
+  /* Emerald 100 */
+  --color-secondary: #064e3b;
+  /* Emerald 900 */
+
+  --bg-color: #f8fafc;
+  /* Slate 50 */
+  --card-bg: #ffffff;
+  --text-color: #1e293b;
+  /* Slate 800 */
+  --text-muted: #64748b;
+  /* Slate 500 */
+  --border-color: #e2e8f0;
+  /* Slate 200 */
+
+  --font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
+/* Dark Mode Class support */
+:root.dark {
+  --bg-color: #0f172a;
+  /* Slate 900 */
+  --card-bg: #1e293b;
+  /* Slate 800 */
+  --text-color: #f1f5f9;
+  /* Slate 100 */
+  --text-muted: #94a3b8;
+  /* Slate 400 */
+  --border-color: #334155;
+  /* Slate 700 */
+  --color-primary-light: #064e3b;
+  /* Darker background for accents in dark mode */
+}
+
+/* Optional: Keep system preference as default if no class is set (handled by JS usually, but good for fallback) */
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) {
+    --bg-color: #0f172a;
+    --card-bg: #1e293b;
+    --text-color: #f1f5f9;
+    --text-muted: #94a3b8;
+    --border-color: #334155;
+    --color-primary-light: #064e3b;
+  }
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  line-height: 1.5;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+}

@@ -1,0 +1,114 @@
+.login-page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: var(--spacing-md);
+    padding-top: 80px;
+    /* Navbar height + extra spacing */
+    background-color: var(--bg-color);
+}
+
+.login-container {
+    width: 100%;
+    max-width: 480px;
+}
+
+.login-card {
+    padding: var(--spacing-2xl);
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: var(--spacing-xl);
+}
+
+.login-header h2 {
+    margin-bottom: var(--spacing-sm);
+}
+
+.login-header p {
+    color: var(--text-muted);
+    font-size: 0.9375rem;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
+
+.btn-block {
+    width: 100%;
+    margin-top: var(--spacing-sm);
+}
+
+.role-selector {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-md);
+}
+
+.role-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: var(--spacing-md);
+    border: 1px solid var(--border);
+    background-color: var(--bg);
+    color: var(--text);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.role-btn:hover {
+    background-color: var(--primary-light);
+    border-color: var(--primary);
+}
+
+.role-btn.active {
+    background-color: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+.login-footer {
+    margin-top: var(--spacing-xl);
+    padding-top: var(--spacing-lg);
+    border-top: 1px solid var(--border);
+    text-align: center;
+}
+
+.login-footer p {
+    color: var(--text-muted);
+    font-size: 0.9375rem;
+    margin: 0;
+}
+
+.toggle-btn {
+    background: none;
+    border: none;
+    color: var(--primary);
+    font-weight: 600;
+    cursor: pointer;
+    margin-left: 0.5rem;
+    font-size: inherit;
+}
+
+.toggle-btn:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 640px) {
+    .login-card {
+        padding: var(--spacing-lg);
+    }
+
+    .role-selector {
+        grid-template-columns: 1fr;
+    }
+}

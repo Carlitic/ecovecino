@@ -1,0 +1,117 @@
+.about-page {
+    padding-bottom: var(--spacing-2xl);
+    padding-top: calc(var(--navbar-height) + var(--spacing-2xl));
+}
+
+.about-header {
+    text-align: center;
+    margin-bottom: var(--spacing-2xl);
+}
+
+.about-header h1 {
+    margin-bottom: var(--spacing-md);
+}
+
+.about-header p {
+    font-size: 1.125rem;
+    color: var(--text-muted);
+}
+
+.text-primary {
+    color: var(--primary);
+}
+
+.author-card {
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto var(--spacing-2xl);
+}
+
+.author-avatar {
+    width: 100px;
+    height: 100px;
+    background-color: var(--primary);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto var(--spacing-lg);
+    box-shadow: 0 0 0 4px var(--primary-light);
+}
+
+.author-card h2 {
+    margin-bottom: var(--spacing-sm);
+}
+
+.role-badge {
+    display: inline-block;
+    background-color: var(--primary-light);
+    color: var(--secondary);
+    padding: 0.375rem 0.875rem;
+    border-radius: 2rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: var(--spacing-lg);
+}
+
+:root.dark .role-badge {
+    background-color: var(--primary);
+    color: white;
+}
+
+.bio {
+    line-height: 1.7;
+    margin-bottom: var(--spacing-lg);
+}
+
+.social-links {
+    display: flex;
+    gap: var(--spacing-md);
+    justify-content: center;
+}
+
+.social-link {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--bg);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text);
+    transition: all 0.2s ease;
+}
+
+.social-link:hover {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.mission-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--spacing-lg);
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.mission-card {
+    text-align: center;
+}
+
+.mission-icon {
+    color: var(--primary);
+    margin-bottom: var(--spacing-md);
+}
+
+.mission-card h3 {
+    margin-bottom: var(--spacing-sm);
+}
+
+.mission-card p {
+    font-size: 0.9375rem;
+}

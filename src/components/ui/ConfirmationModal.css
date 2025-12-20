@@ -1,0 +1,79 @@
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(2px);
+}
+
+.modal-content {
+    background-color: var(--card-bg);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    max-width: 400px;
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+    animation: modalSlideIn 0.2s ease-out;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-header {
+    padding: var(--spacing-lg);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 1.125rem;
+    color: var(--text-color);
+}
+
+.modal-body {
+    padding: var(--spacing-lg);
+    color: var(--text-muted);
+}
+
+.modal-footer {
+    padding: var(--spacing-md) var(--spacing-lg);
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--spacing-md);
+    background-color: var(--bg-color);
+    border-top: 1px solid var(--border-color);
+}
+
+.modal-footer button {
+    min-width: 80px;
+}
+
+/* Specific danger variant for Button component if needed, 
+   otherwise rely on standard red styles if already defined or use inline style */
+.btn-danger {
+    background-color: #ef4444 !important;
+    color: white !important;
+}
+
+.btn-danger:hover {
+    background-color: #dc2626 !important;
+}

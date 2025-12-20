@@ -1,0 +1,87 @@
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.input-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.required {
+    color: #ef4444;
+    margin-left: 0.25rem;
+}
+
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon {
+    position: absolute;
+    left: 1rem;
+    color: var(--text-muted);
+    pointer-events: none;
+}
+
+.input {
+    width: 100%;
+    padding: 1rem 1rem;
+    /* Increased vertical padding from 0.75rem */
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    font-size: 1rem;
+    background-color: var(--card-bg);
+    /* Use card-bg for inputs */
+    color: var(--text-color);
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.input-with-icon {
+    padding-left: 3rem;
+    /* Reverted to original reasonable spacing */
+}
+
+.input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+
+.input-error {
+    border-color: #ef4444;
+}
+
+.input-error:focus {
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.error-message {
+    font-size: 0.875rem;
+    color: #ef4444;
+}
+
+/* Select */
+/* Select specific styles */
+select.input {
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1em;
+    padding-right: 2.5rem;
+    /* Make room for the arrow */
+}
+
+/* Ensure padding-left is sufficient for the icon on the left */
+select.input.input-with-icon {
+    padding-left: 3.5rem;
+}

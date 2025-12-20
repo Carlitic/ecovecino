@@ -1,0 +1,92 @@
+.neighbor-form {
+    margin-bottom: var(--spacing-xl);
+}
+
+.neighbor-form h3 {
+    margin-bottom: var(--spacing-lg);
+}
+
+.neighbors-table-card {
+    overflow-x: auto;
+}
+
+.neighbors-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.neighbors-table th {
+    text-align: left;
+    padding: var(--spacing-md);
+    border-bottom: 2px solid var(--border);
+    font-weight: 600;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.neighbors-table td {
+    padding: var(--spacing-md);
+    border-bottom: 1px solid var(--border);
+}
+
+.neighbors-table tbody tr:hover {
+    background-color: var(--bg);
+}
+
+.type-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.type-badge.president {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.type-badge.owner {
+    background-color: #dbeafe;
+    color: #1e40af;
+}
+
+.type-badge.tenant {
+    background-color: #fce7f3;
+    color: #9d174d;
+}
+
+:root.dark .type-badge.president {
+    background-color: #78350f;
+    color: #fef3c7;
+}
+
+:root.dark .type-badge.owner {
+    background-color: #1e3a8a;
+    color: #dbeafe;
+}
+
+:root.dark .type-badge.tenant {
+    background-color: #831843;
+    color: #fce7f3;
+}
+
+.icon-btn {
+    background: none;
+    border: none;
+    padding: 0.5rem;
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    transition: all 0.2s ease;
+}
+
+.icon-btn:hover {
+    background-color: var(--bg);
+}
+
+.delete-btn:hover {
+    color: #ef4444;
+    background-color: rgba(239, 68, 68, 0.1);
+}

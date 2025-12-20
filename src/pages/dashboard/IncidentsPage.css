@@ -1,0 +1,127 @@
+.incident-form {
+    margin-bottom: var(--spacing-xl);
+}
+
+.incident-form h3 {
+    margin-bottom: var(--spacing-lg);
+}
+
+.form-grid {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
+
+.form-actions {
+    display: flex;
+    gap: var(--spacing-md);
+    justify-content: flex-end;
+}
+
+.incidents-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: var(--spacing-lg);
+}
+
+.incident-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.incident-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+}
+
+.incident-header h3 {
+    font-size: 1.125rem;
+    flex: 1;
+}
+
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.status-pending {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.status-progress {
+    background-color: #dbeafe;
+    color: #1e40af;
+}
+
+.status-resolved {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+:root.dark .status-pending {
+    background-color: #78350f;
+    color: #fef3c7;
+}
+
+:root.dark .status-progress {
+    background-color: #1e3a8a;
+    color: #dbeafe;
+}
+
+:root.dark .status-resolved {
+    background-color: #064e3b;
+    color: #d1fae5;
+}
+
+.incident-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: var(--spacing-md);
+    border-top: 1px solid var(--border-color);
+}
+
+.incident-date {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+}
+
+textarea.input {
+    resize: vertical;
+    min-height: 100px;
+    padding: var(--spacing-md);
+    font-family: inherit;
+    background-color: var(--card-bg);
+    /* Ensure background is set */
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+
+.status-select {
+    padding: 0.375rem 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    background-color: var(--card-bg);
+    /* Use card-bg instead of bg-color for better contrast in inputs */
+    color: var(--text-color);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.status-select:hover {
+    border-color: var(--color-primary);
+}
+
+.status-select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px var(--color-primary-light);
+}
