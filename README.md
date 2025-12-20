@@ -4,7 +4,7 @@
 
 ### 🌐 Demo en Vivo
 Puedes ver el proyecto funcionando aquí:  
-👉 **[https://ecovecino-d017f.web.app](https://ecovecino-d017f.web.app)**
+👉 **[https://carlitic.github.io/EcoVecino/](https://carlitic.github.io/EcoVecino/)**
 
 ## 🚀 Características Principales
 
