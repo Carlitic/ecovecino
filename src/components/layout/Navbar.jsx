@@ -33,7 +33,7 @@ export default function Navbar() {
         <nav className="navbar">
             <div className="navbar-container container">
                 <Link to="/" className="navbar-logo">
-                    <img src="/logo.png" alt="Eco Vecinos" className="logo-img" />
+                    <img src={`${import.meta.env.BASE_URL}logo.png`} alt="Eco Vecinos" className="logo-img" />
                     <span>Eco Vecinos</span>
                 </Link>
 
