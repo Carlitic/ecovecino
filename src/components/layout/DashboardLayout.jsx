@@ -1,5 +1,6 @@
 import { Outlet, Link, useLocation, useNavigate, Navigate } from 'react-router-dom';
-import { Home, Building, Users, AlertCircle, Calendar, LogOut, MessageSquare } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Home, Building, Users, AlertCircle, Calendar, LogOut, MessageSquare, Menu, X } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import './DashboardLayout.css';
 
@@ -37,10 +38,49 @@ export default function DashboardLayout() {
     const filteredNavItems = NAV_ITEMS.filter(item => item.roles.includes(currentUser.role));
 
     return (
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+    // Close mobile menu when route changes
+    useEffect(() => {
+        setIsMobileMenuOpen(false);
+    }, [location.pathname]);
+
+    // ... existing helpers ...
+
+    return (
         <div className="dashboard-layout">
-            <aside className="dashboard-sidebar">
+            {/* Mobile Header */}
+            <header className="dashboard-mobile-header">
+                <button
+                    className="mobile-menu-toggle"
+                    onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                    aria-label="Toggle menu"
+                >
+                    {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                </button>
+                <img src={`${import.meta.env.BASE_URL}logo.png`} alt="Eco Vecinos" className="mobile-logo-img" />
+                <h1 className="mobile-page-title">Eco Vecinos</h1>
+            </header>
+
+            {/* Sidebar Overlay (Mobile only) */}
+            {isMobileMenuOpen && (
+                <div
+                    className="sidebar-overlay"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                />
+            )}
+
+            <aside className={`dashboard-sidebar ${isMobileMenuOpen ? 'open' : ''}`}>
                 <div className="sidebar-header">
-                    <img src={`${import.meta.env.BASE_URL}logo.png`} alt="Eco Vecinos" className="sidebar-logo" />
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <img src={`${import.meta.env.BASE_URL}logo.png`} alt="Eco Vecinos" className="sidebar-logo" />
+                        <button
+                            className="close-sidebar-mobile"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                            <X size={20} />
+                        </button>
+                    </div>
                     <div className="user-info">
                         <p className="user-name">{currentUser.name}</p>
                         <span className="panel-badge">{getPanelTitle()}</span>
