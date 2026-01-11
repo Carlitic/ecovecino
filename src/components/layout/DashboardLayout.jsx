@@ -37,15 +37,12 @@ export default function DashboardLayout() {
 
     const filteredNavItems = NAV_ITEMS.filter(item => item.roles.includes(currentUser.role));
 
-    return (
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     // Close mobile menu when route changes
     useEffect(() => {
         setIsMobileMenuOpen(false);
     }, [location.pathname]);
-
-    // ... existing helpers ...
 
     return (
         <div className="dashboard-layout">
