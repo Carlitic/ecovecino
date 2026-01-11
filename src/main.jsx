@@ -8,7 +8,7 @@ import App from './App.jsx'
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <AuthProvider>
-      <BrowserRouter basename="/EcoVecino/">
+      <BrowserRouter basename="/ecovecino/">
         <App />
       </BrowserRouter>
     </AuthProvider>

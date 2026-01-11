@@ -40,7 +40,7 @@ export default function DashboardLayout() {
         <div className="dashboard-layout">
             <aside className="dashboard-sidebar">
                 <div className="sidebar-header">
-                    <img src="/logo.png" alt="Eco Vecinos" className="sidebar-logo" />
+                    <img src={`${import.meta.env.BASE_URL}logo.png`} alt="Eco Vecinos" className="sidebar-logo" />
                     <div className="user-info">
                         <p className="user-name">{currentUser.name}</p>
                         <span className="panel-badge">{getPanelTitle()}</span>

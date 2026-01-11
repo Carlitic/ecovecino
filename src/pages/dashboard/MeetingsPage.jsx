@@ -5,8 +5,8 @@ import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import ConfirmationModal from '../../components/ui/ConfirmationModal';
 import { useAuth } from '../../context/AuthContext';
-import { db } from '../../lib/firebase';
-import { collection, addDoc, getDocs, deleteDoc, doc, query, where } from 'firebase/firestore';
+import { databases, DB_ID, COLLECTIONS } from '../../lib/appwrite';
+import { ID, Query } from 'appwrite';
 import './MeetingsPage.css';
 
 export default function MeetingsPage() {
@@ -26,26 +26,26 @@ export default function MeetingsPage() {
 
     const fetchMeetings = async () => {
         try {
-            if (!currentUser.community_id && currentUser.role !== 'super_admin') {
-                setLoading(false);
-                return;
+            let queries = [];
+
+            if (currentUser?.community_id) {
+                queries.push(Query.equal('community_id', currentUser.community_id));
             }
 
-            let q;
-            if (currentUser.role === 'super_admin') {
-                q = collection(db, "meetings");
-            } else {
-                q = query(collection(db, "meetings"), where("community_id", "==", currentUser.community_id));
-            }
+            // Ordenar por fecha del campo 'date' descendente
+            queries.push(Query.orderDesc('date'));
 
-            const querySnapshot = await getDocs(q);
-            const data = querySnapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
+            const response = await databases.listDocuments(
+                DB_ID,
+                COLLECTIONS.MEETINGS,
+                queries
+            );
+
+            const data = response.documents.map(doc => ({
+                id: doc.$id,
+                ...doc
             }));
 
-            // Sort by date descending
-            data.sort((a, b) => new Date(b.date) - new Date(a.date));
             setMeetings(data);
         } catch (error) {
             console.error("Error loading meetings:", error);
@@ -60,15 +60,21 @@ export default function MeetingsPage() {
             const meetingData = {
                 title: newMeeting.title,
                 description: newMeeting.description,
-                date: newMeeting.date,
+                date: newMeeting.date, // Asegurarse de que el formato sea compatible con DateTime de Appwrite (ISO)
                 time: newMeeting.time,
                 location: newMeeting.location || 'Virtual (Videollamada)',
-                community_id: currentUser.community_id,
-                created_by: currentUser.uid || currentUser.id
+                community_id: currentUser.community_id || 'default_community',
+                // created_by: currentUser.$id // Usaremos author_id si existe en el esquema, o no lo enviamos si no
             };
 
-            const docRef = await addDoc(collection(db, "meetings"), meetingData);
-            setMeetings([{ id: docRef.id, ...meetingData }, ...meetings]);
+            const response = await databases.createDocument(
+                DB_ID,
+                COLLECTIONS.MEETINGS,
+                ID.unique(),
+                meetingData
+            );
+
+            setMeetings([{ id: response.$id, ...response }, ...meetings]);
 
             setNewMeeting({ title: '', description: '', date: '', time: '', location: '' });
             setShowForm(false);
@@ -87,7 +93,7 @@ export default function MeetingsPage() {
             message: '¿Estás seguro de que quieres cancelar esta junta? Esta acción no se puede deshacer.',
             onConfirm: async () => {
                 try {
-                    await deleteDoc(doc(db, "meetings", id));
+                    await databases.deleteDocument(DB_ID, COLLECTIONS.MEETINGS, id);
                     setMeetings(prev => prev.filter(m => m.id !== id));
                     setModalConfig({ ...modalConfig, isOpen: false });
                 } catch (error) {

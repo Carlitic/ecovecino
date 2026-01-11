@@ -4,8 +4,8 @@ import Card from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import { useAuth } from '../../context/AuthContext';
-import { db } from '../../lib/firebase';
-import { collection, addDoc, getDocs, updateDoc, deleteDoc, doc } from 'firebase/firestore';
+import { databases, DB_ID, COLLECTIONS } from '../../lib/appwrite';
+import { ID } from 'appwrite';
 import './CommunitiesPage.css';
 
 export default function CommunitiesPage() {
@@ -17,17 +17,21 @@ export default function CommunitiesPage() {
 
     const [editingId, setEditingId] = useState(null);
 
-    // Cargar comunidades desde Firestore
+    // Cargar comunidades desde Appwrite
     useEffect(() => {
         fetchCommunities();
     }, []);
 
     const fetchCommunities = async () => {
         try {
-            const querySnapshot = await getDocs(collection(db, "communities"));
-            const communitiesData = querySnapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
+            const response = await databases.listDocuments(
+                DB_ID,
+                COLLECTIONS.COMMUNITIES
+            );
+
+            const communitiesData = response.documents.map(doc => ({
+                id: doc.$id,
+                ...doc
             }));
             setCommunities(communitiesData);
         } catch (error) {
@@ -43,10 +47,15 @@ export default function CommunitiesPage() {
         try {
             if (editingId) {
                 // Edit mode
-                await updateDoc(doc(db, "communities", editingId), {
-                    name: newCommunity.name,
-                    address: newCommunity.address
-                });
+                await databases.updateDocument(
+                    DB_ID,
+                    COLLECTIONS.COMMUNITIES,
+                    editingId,
+                    {
+                        name: newCommunity.name,
+                        address: newCommunity.address
+                    }
+                );
 
                 // Actualizar estado local
                 setCommunities(communities.map(c =>
@@ -57,19 +66,24 @@ export default function CommunitiesPage() {
                 setEditingId(null);
             } else {
                 // Create mode
-                const docRef = await addDoc(collection(db, "communities"), {
+                const docData = {
                     name: newCommunity.name,
                     address: newCommunity.address,
-                    created_at: new Date().toISOString(),
-                    president_id: null
-                });
+                    // created_at: Automático
+                    president_id: null // Opcional, Appwrite lo maneja como string null si no se envía o se envía null
+                };
+
+                const response = await databases.createDocument(
+                    DB_ID,
+                    COLLECTIONS.COMMUNITIES,
+                    ID.unique(),
+                    docData
+                );
 
                 // Añadir al estado local
                 setCommunities([...communities, {
-                    id: docRef.id,
-                    name: newCommunity.name,
-                    address: newCommunity.address,
-                    president_id: null
+                    id: response.$id,
+                    ...docData
                 }]);
             }
 
@@ -90,7 +104,7 @@ export default function CommunitiesPage() {
     const handleDelete = async (id) => {
         if (window.confirm('¿Estás seguro de que quieres eliminar esta comunidad?')) {
             try {
-                await deleteDoc(doc(db, "communities", id));
+                await databases.deleteDocument(DB_ID, COLLECTIONS.COMMUNITIES, id);
                 setCommunities(communities.filter(c => c.id !== id));
             } catch (error) {
                 console.error("Error eliminando:", error);

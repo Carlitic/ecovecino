@@ -5,8 +5,8 @@ import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import ConfirmationModal from '../../components/ui/ConfirmationModal';
 import { useAuth } from '../../context/AuthContext';
-import { db } from '../../lib/firebase';
-import { collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, where } from 'firebase/firestore';
+import { databases, DB_ID, COLLECTIONS } from '../../lib/appwrite';
+import { ID, Query } from 'appwrite';
 import './NeighborsPage.css';
 
 export default function NeighborsPage() {
@@ -41,8 +41,11 @@ export default function NeighborsPage() {
 
     const fetchCommunities = async () => {
         try {
-            const snapshot = await getDocs(collection(db, "communities"));
-            setCommunities(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+            const response = await databases.listDocuments(
+                DB_ID,
+                COLLECTIONS.COMMUNITIES
+            );
+            setCommunities(response.documents.map(doc => ({ id: doc.$id, ...doc })));
         } catch (error) {
             console.error("Error fetching communities:", error);
         }
@@ -55,21 +58,24 @@ export default function NeighborsPage() {
                 return;
             }
 
-            let q;
-            const usersRef = collection(db, "users");
-            if (currentUser.role === 'super_admin') {
-                q = usersRef;
-            } else {
-                q = query(usersRef, where("community_id", "==", currentUser.community_id || ""));
+            let queries = [];
+
+            if (currentUser.role !== 'super_admin') {
+                queries.push(Query.equal('community_id', currentUser.community_id || ""));
             }
 
-            const querySnapshot = await getDocs(q);
-            const data = querySnapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
+            const response = await databases.listDocuments(
+                DB_ID,
+                COLLECTIONS.USERS, // Usando la colección 'users' para listar vecinos
+                queries
+            );
+
+            const data = response.documents.map(doc => ({
+                id: doc.$id,
+                ...doc
             }));
 
-            // Filter out super_admins from the list locally
+            // Filter out super_admins from the list locally (si existieran en esa tabla)
             setNeighbors(data.filter(u => u.role !== 'super_admin'));
         } catch (error) {
             console.error("Error loading neighbors:", error);
@@ -93,9 +99,6 @@ export default function NeighborsPage() {
 
             if (newNeighbor.id) {
                 // Edit existing
-                const docRef = doc(db, "users", newNeighbor.id);
-                // We do NOT update email here for Auth purposes, only for the record in Firestore
-                // Changing auth email is more complex and usually requires user re-authentication
                 const updateData = {
                     name: newNeighbor.name,
                     phone: newNeighbor.phone,
@@ -108,16 +111,18 @@ export default function NeighborsPage() {
                     updateData.community_id = targetCommunityId;
                 }
 
-                await updateDoc(docRef, updateData);
+                await databases.updateDocument(
+                    DB_ID,
+                    COLLECTIONS.USERS,
+                    newNeighbor.id,
+                    updateData
+                );
 
                 setNeighbors(neighbors.map(n =>
                     n.id === newNeighbor.id ? { ...n, ...updateData, email: newNeighbor.email } : n
                 ));
             } else {
                 // Create new "placeholder" user
-                // Note: This does NOT create a Firebase Auth account. The user would need to register.
-                // Or we could implement an Admin Admin SDK function to create users (backend required).
-                // For this scope, we'll store them as data records.
                 const neighborData = {
                     name: newNeighbor.name,
                     email: newNeighbor.email,
@@ -126,11 +131,17 @@ export default function NeighborsPage() {
                     unit: newNeighbor.unit,
                     linked_owner_id: newNeighbor.role === 'tenant' ? newNeighbor.linked_owner_id : null,
                     community_id: targetCommunityId,
-                    created_at: new Date().toISOString()
+                    // created_at: Automático
                 };
 
-                const docRef = await addDoc(collection(db, "users"), neighborData);
-                setNeighbors([...neighbors, { id: docRef.id, ...neighborData }]);
+                const response = await databases.createDocument(
+                    DB_ID,
+                    COLLECTIONS.USERS,
+                    ID.unique(),
+                    neighborData
+                );
+
+                setNeighbors([...neighbors, { id: response.$id, ...neighborData }]);
             }
 
             setNewNeighbor({ name: '', email: '', phone: '', role: 'owner', unit: '', linked_owner_id: '', community_id: '' });
@@ -150,7 +161,7 @@ export default function NeighborsPage() {
             message: '¿Estás seguro de que quieres eliminar a este vecino? Esta acción borrará sus datos.',
             onConfirm: async () => {
                 try {
-                    await deleteDoc(doc(db, "users", id));
+                    await databases.deleteDocument(DB_ID, COLLECTIONS.USERS, id);
                     setNeighbors(prev => prev.filter(n => n.id !== id));
                     setModalConfig({ ...modalConfig, isOpen: false });
                 } catch (error) {

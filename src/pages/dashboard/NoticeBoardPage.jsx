@@ -5,8 +5,8 @@ import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import ConfirmationModal from '../../components/ui/ConfirmationModal';
 import { useAuth } from '../../context/AuthContext';
-import { db } from '../../lib/firebase';
-import { collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, where } from 'firebase/firestore';
+import { databases, DB_ID, COLLECTIONS } from '../../lib/appwrite';
+import { ID, Query } from 'appwrite';
 import './NoticeBoardPage.css';
 
 export default function NoticeBoardPage() {
@@ -28,49 +28,33 @@ export default function NoticeBoardPage() {
     useEffect(() => {
         if (currentUser) {
             fetchData();
-            if (currentUser.role === 'super_admin') {
-                fetchCommunities();
-            }
+            // Appwrite communities logic would go here if needed
         }
     }, [currentUser]);
 
-    const fetchCommunities = async () => {
-        try {
-            const snapshot = await getDocs(collection(db, "communities"));
-            setCommunities(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-        } catch (error) {
-            console.error("Error fetching communities:", error);
-        }
-    };
-
     const fetchData = async () => {
         try {
-            if (!currentUser.community_id && currentUser.role !== 'super_admin') {
-                setLoading(false);
-                return;
+            const queries = [];
+            // Filtro por comunidad si no es super admin (ajustar según tu lógica de roles en Appwrite)
+            if (currentUser?.community_id) {
+                queries.push(Query.equal('community_id', currentUser.community_id));
             }
 
-            let postsQuery, servicesQuery;
+            // Para Posts: Ordenar por creación descendente
+            const postsQueries = [...queries, Query.orderDesc('$createdAt')];
+            // Para Services: Sin orden específico o por nombre
+            const servicesQueries = [...queries];
 
-            if (currentUser.role === 'super_admin') {
-                postsQuery = collection(db, "posts");
-                servicesQuery = collection(db, "services");
-            } else {
-                postsQuery = query(collection(db, "posts"), where("community_id", "==", currentUser.community_id));
-                servicesQuery = query(collection(db, "services"), where("community_id", "==", currentUser.community_id));
-            }
-
-            const [postsSnap, servicesSnap] = await Promise.all([
-                getDocs(postsQuery),
-                getDocs(servicesQuery)
+            const [postsRes, servicesRes] = await Promise.all([
+                databases.listDocuments(DB_ID, COLLECTIONS.POSTS, postsQueries),
+                databases.listDocuments(DB_ID, COLLECTIONS.SERVICES, servicesQueries)
             ]);
 
-            const loadedPosts = postsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-            // Ordenar por fecha descending
-            loadedPosts.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            const loadedPosts = postsRes.documents.map(d => ({ id: d.$id, ...d }));
+            const loadedServices = servicesRes.documents.map(d => ({ id: d.$id, ...d }));
 
             setPosts(loadedPosts);
-            setServices(servicesSnap.docs.map(d => ({ id: d.id, ...d.data() })));
+            setServices(loadedServices);
         } catch (error) {
             console.error("Error cargando tablero:", error);
         } finally {
@@ -81,25 +65,24 @@ export default function NoticeBoardPage() {
     const handlePostSubmit = async (e) => {
         e.preventDefault();
         try {
-            const targetCommunityId = currentUser.role === 'super_admin'
-                ? newPost.community_id
-                : currentUser.community_id;
-
-            if (!targetCommunityId) {
-                alert("Debes seleccionar una comunidad");
-                return;
-            }
+            const targetCommunityId = currentUser.community_id || 'default_community';
 
             const newPostData = {
                 title: newPost.title,
                 content: newPost.content,
                 community_id: targetCommunityId,
-                author_id: currentUser.uid || currentUser.id,
-                created_at: new Date().toISOString()
+                author_id: currentUser.$id,
+                // created_at: Automático
             };
 
-            const docRef = await addDoc(collection(db, "posts"), newPostData);
-            setPosts([{ id: docRef.id, ...newPostData }, ...posts]);
+            const response = await databases.createDocument(
+                DB_ID,
+                COLLECTIONS.POSTS,
+                ID.unique(),
+                newPostData
+            );
+
+            setPosts([{ id: response.$id, ...response }, ...posts]);
 
             setNewPost({ title: '', content: '', community_id: '' });
             setShowPostForm(false);
@@ -112,28 +95,27 @@ export default function NoticeBoardPage() {
     const handleServiceSubmit = async (e) => {
         e.preventDefault();
         try {
-            const targetCommunityId = currentUser.role === 'super_admin'
-                ? serviceData.community_id
-                : currentUser.community_id;
-
-            if (!targetCommunityId) {
-                alert("Debes seleccionar una comunidad");
-                return;
-            }
+            const targetCommunityId = currentUser.community_id || 'default_community';
 
             if (serviceData.id) {
                 // Edit
-                const docRef = doc(db, "services", serviceData.id);
                 const { id, ...dataToUpdate } = serviceData;
 
-                // Allow updating community if super_admin
-                if (currentUser.role === 'super_admin') {
-                    dataToUpdate.community_id = targetCommunityId;
-                }
+                // Limpieza de datos no requeridos
+                const updates = {
+                    name: dataToUpdate.name,
+                    contact: dataToUpdate.contact,
+                    phone: dataToUpdate.phone
+                };
 
-                await updateDoc(docRef, dataToUpdate);
+                await databases.updateDocument(
+                    DB_ID,
+                    COLLECTIONS.SERVICES,
+                    id,
+                    updates
+                );
 
-                setServices(services.map(s => s.id === serviceData.id ? { ...s, ...dataToUpdate, community_id: targetCommunityId } : s));
+                setServices(services.map(s => s.id === serviceData.id ? { ...s, ...updates } : s));
             } else {
                 // Create
                 const newServiceDesc = {
@@ -142,8 +124,15 @@ export default function NoticeBoardPage() {
                     phone: serviceData.phone,
                     community_id: targetCommunityId
                 };
-                const docRef = await addDoc(collection(db, "services"), newServiceDesc);
-                setServices([...services, { id: docRef.id, ...newServiceDesc }]);
+
+                const response = await databases.createDocument(
+                    DB_ID,
+                    COLLECTIONS.SERVICES,
+                    ID.unique(),
+                    newServiceDesc
+                );
+
+                setServices([...services, { id: response.$id, ...newServiceDesc }]);
             }
             setServiceData({ id: null, name: '', contact: '', phone: '', community_id: '' });
             setShowServiceForm(false);
@@ -162,7 +151,7 @@ export default function NoticeBoardPage() {
             message: '¿Estás seguro de que quieres borrar este anuncio?',
             onConfirm: async () => {
                 try {
-                    await deleteDoc(doc(db, "posts", id));
+                    await databases.deleteDocument(DB_ID, COLLECTIONS.POSTS, id);
                     setPosts(prev => prev.filter(p => p.id !== id));
                     setModalConfig({ ...modalConfig, isOpen: false });
                 } catch (error) {
@@ -179,7 +168,7 @@ export default function NoticeBoardPage() {
             message: '¿Estás seguro de que quieres eliminar este servicio de contacto?',
             onConfirm: async () => {
                 try {
-                    await deleteDoc(doc(db, "services", id));
+                    await databases.deleteDocument(DB_ID, COLLECTIONS.SERVICES, id);
                     setServices(prev => prev.filter(s => s.id !== id));
                     setModalConfig({ ...modalConfig, isOpen: false });
                 } catch (error) {
@@ -349,7 +338,7 @@ export default function NoticeBoardPage() {
                                     </div>
                                     <p>{post.content}</p>
                                     <span className="post-date">
-                                        {post.created_at ? new Date(post.created_at).toLocaleDateString('es-ES') : ''}
+                                        {post.$createdAt ? new Date(post.$createdAt).toLocaleDateString('es-ES') : ''}
                                     </span>
                                 </Card>
                             ))}

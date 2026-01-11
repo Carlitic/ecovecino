@@ -4,9 +4,8 @@ import { Mail, Lock, User, Phone, Building, KeyRound, Shield } from 'lucide-reac
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
-// import { mockCommunities } from '../../lib/mockData'; // Removed
-import { db } from '../../lib/firebase';
-import { collection, getDocs } from 'firebase/firestore';
+import Alert from '../../components/ui/Alert';
+import { databases, DB_ID, COLLECTIONS } from '../../lib/appwrite';
 import './LoginPage.css';
 
 import { useAuth } from '../../context/AuthContext';
@@ -15,6 +14,7 @@ export default function LoginPage() {
     const { login, signup } = useAuth();
     // ...
     const [isLogin, setIsLogin] = useState(true);
+    const [error, setError] = useState(null); // Nuevo estado para errores
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
         email: '',
@@ -30,23 +30,33 @@ export default function LoginPage() {
 
     useEffect(() => {
         const fetchCommunities = async () => {
+            // ... existing code ...
+            // (omitted for brevity in replacement, but keep existing logic)
             try {
-                const querySnapshot = await getDocs(collection(db, "communities"));
-                const comms = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                const response = await databases.listDocuments(
+                    DB_ID,
+                    COLLECTIONS.COMMUNITIES
+                );
+                const comms = response.documents.map(doc => ({ id: doc.$id, ...doc }));
                 setCommunities(comms);
             } catch (error) {
                 console.error("Error fetching communities:", error);
             }
         };
-        fetchCommunities();
-    }, []);
+        // Solo cargar comunidades si estamos en modo registro
+        if (!isLogin) {
+            fetchCommunities();
+        }
+    }, [isLogin]);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
+        if (error) setError(null); // Limpiar error al escribir
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setError(null); // Limpiar errores previos
         try {
             if (isLogin) {
                 await login(formData.email, formData.password);
@@ -56,13 +66,26 @@ export default function LoginPage() {
             navigate('/dashboard');
         } catch (error) {
             console.error("Authentication error:", error);
-            alert("Error de autenticación: " + error.message);
+            // Manejo específico del error de sesión activa
+            if (error.message.includes('creation of a session is prohibited')) {
+                navigate('/dashboard'); // Si ya tiene sesión, pa' dentro
+            } else if (error.message.includes('Rate limit')) {
+                setError("Has realizado demasiados intentos. Por favor, espera unos minutos.");
+            } else {
+                setError(error.message || "Error de autenticación. Verifica tus credenciales.");
+            }
         }
     };
 
     return (
         <div className="login-page">
             <Card className="login-card">
+                <Alert
+                    type="error"
+                    message={error}
+                    onClose={() => setError(null)}
+                />
+
                 <div className="login-header">
                     <h2>{isLogin ? 'Bienvenido de nuevo' : 'Únete a Eco Vecinos'}</h2>
                     <p>{isLogin ? 'Accede a tu comunidad' : 'Gestiona tu comunidad de forma eficiente'}</p>
