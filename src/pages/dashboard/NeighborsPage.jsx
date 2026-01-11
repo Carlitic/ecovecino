@@ -324,7 +324,7 @@ export default function NeighborsPage() {
                         ) : (
                             neighbors.map(neighbor => (
                                 <tr key={neighbor.id}>
-                                    <td>
+                                    <td data-label="Nombre">
                                         <div style={{ fontWeight: 500 }}>{neighbor.name}</div>
                                         {neighbor.role === 'tenant' && neighbor.linked_owner_id && (
                                             <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
@@ -332,22 +332,22 @@ export default function NeighborsPage() {
                                             </div>
                                         )}
                                     </td>
-                                    <td>{neighbor.unit || '-'}</td>
+                                    <td data-label="Piso">{neighbor.unit || '-'}</td>
                                     {currentUser.role === 'super_admin' && (
-                                        <td>{getCommunityName(neighbor.community_id)}</td>
+                                        <td data-label="Comunidad">{getCommunityName(neighbor.community_id)}</td>
                                     )}
-                                    <td>
+                                    <td data-label="Contacto">
                                         <div>{neighbor.email}</div>
                                         <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{neighbor.phone}</div>
                                     </td>
-                                    <td>
+                                    <td data-label="Tipo">
                                         <span className={`type-badge ${neighbor.role}`}>
                                             {neighbor.role === 'president' ? 'Presidente' :
                                                 neighbor.role === 'owner' ? 'Propietario' : 'Inquilino'}
                                         </span>
                                     </td>
                                     {(currentUser.role === 'president' || currentUser.role === 'super_admin') && (
-                                        <td>
+                                        <td data-label="Acciones">
                                             <div style={{ display: 'flex', gap: '0.25rem' }}>
                                                 <button
                                                     className="icon-btn"

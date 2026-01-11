@@ -90,3 +90,51 @@
     color: #ef4444;
     background-color: rgba(239, 68, 68, 0.1);
 }
+
+@media (max-width: 768px) {
+    .neighbors-table thead {
+        display: none;
+    }
+
+    .neighbors-table,
+    .neighbors-table tbody,
+    .neighbors-table tr,
+    .neighbors-table td {
+        display: block;
+        width: 100%;
+    }
+
+    .neighbors-table tr {
+        background-color: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        margin-bottom: var(--spacing-md);
+        padding: var(--spacing-sm);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .neighbors-table td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        text-align: right;
+        padding: var(--spacing-sm) var(--spacing-md);
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .neighbors-table td:last-child {
+        border-bottom: none;
+        justify-content: flex-end;
+        /* Action buttons */
+    }
+
+    .neighbors-table td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        margin-right: 1rem;
+        text-align: left;
+    }
+}
