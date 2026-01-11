@@ -41,7 +41,8 @@ export const AuthProvider = ({ children }) => {
             return true;
         } catch (error) {
             // Si ya hay sesión activa, simplemente actualizamos el estado
-            if (error.message && error.message.includes('creation of a session is prohibited')) {
+            const msg = error.message ? error.message.toLowerCase() : '';
+            if (msg.includes('creation of a session is prohibited') || msg.includes('active session')) {
                 await checkUserStatus();
                 return true;
             }
@@ -60,7 +61,8 @@ export const AuthProvider = ({ children }) => {
                 await account.createEmailPasswordSession(formData.email, formData.password);
             } catch (sessionError) {
                 // Si el usuario ya tenía sesión (raro en registro pero posible), continuamos
-                if (!sessionError.message?.includes('creation of a session is prohibited')) {
+                const sessionMsg = sessionError.message ? sessionError.message.toLowerCase() : '';
+                if (!sessionMsg.includes('creation of a session is prohibited')) {
                     throw sessionError;
                 }
             }
