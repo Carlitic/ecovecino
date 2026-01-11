@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Moon, Sun } from 'lucide-react';
+import { Moon, Sun, Menu, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import Button from '../ui/Button';
 import './Navbar.css';
@@ -13,6 +13,8 @@ export default function Navbar() {
         return false;
     });
 
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+
     useEffect(() => {
         if (isDark) {
             document.documentElement.classList.add('dark');
@@ -25,6 +27,8 @@ export default function Navbar() {
         }
     }, [isDark]);
 
+    const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+
     return (
         <nav className="navbar">
             <div className="navbar-container container">
@@ -33,9 +37,13 @@ export default function Navbar() {
                     <span>Eco Vecinos</span>
                 </Link>
 
-                <div className="navbar-links">
-                    <Link to="/" className="nav-link">Inicio</Link>
-                    <Link to="/about" className="nav-link">Sobre Nosotros</Link>
+                <button className="menu-toggle" onClick={toggleMenu}>
+                    {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                </button>
+
+                <div className={`navbar-links ${isMenuOpen ? 'active' : ''}`}>
+                    <Link to="/" className="nav-link" onClick={() => setIsMenuOpen(false)}>Inicio</Link>
+                    <Link to="/about" className="nav-link" onClick={() => setIsMenuOpen(false)}>Sobre Nosotros</Link>
                     <button
                         onClick={() => setIsDark(!isDark)}
                         className="theme-toggle"
@@ -43,7 +51,7 @@ export default function Navbar() {
                     >
                         {isDark ? <Sun size={20} /> : <Moon size={20} />}
                     </button>
-                    <Link to="/login">
+                    <Link to="/login" onClick={() => setIsMenuOpen(false)}>
                         <Button size="sm">Acceder</Button>
                     </Link>
                 </div>
