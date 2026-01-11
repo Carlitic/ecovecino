@@ -67,9 +67,11 @@ export default function LoginPage() {
         } catch (error) {
             console.error("Authentication error:", error);
             // Manejo específico del error de sesión activa
-            if (error.message.includes('creation of a session is prohibited')) {
+            // Manejo específico del error de sesión activa
+            const errorMsg = error.message ? error.message.toLowerCase() : '';
+            if (errorMsg.includes('creation of a session is prohibited') || errorMsg.includes('active session')) {
                 navigate('/dashboard'); // Si ya tiene sesión, pa' dentro
-            } else if (error.message.includes('Rate limit')) {
+            } else if (errorMsg.includes('rate limit')) {
                 setError("Has realizado demasiados intentos. Por favor, espera unos minutos.");
             } else {
                 setError(error.message || "Error de autenticación. Verifica tus credenciales.");
